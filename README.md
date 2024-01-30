@@ -11,8 +11,11 @@ Then from `our-new-feature` developers created their sub-branches and created PR
 Then:
 - navigate to your repository directory
 - run `featureup our-new-feature`
+- that's all
 
-This will:
+## How it works
+
+The command `featureup our-new-feature` will:
 - update your local `develop` to be in sync with `develop` in remote repository
 - update your local `our-new-feature` branch to be in sync with remote
 - merge `develop` in `our-new-feature` and push
