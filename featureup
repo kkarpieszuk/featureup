@@ -1,0 +1,66 @@
+#!/bin/bash
+
+# Check if git and gh are installed.
+if ! command -v git &> /dev/null; then
+    echo "git is not installed. Please install it and try again."
+    exit 1
+fi
+
+if ! command -v gh &> /dev/null; then
+    echo "GitHub CLI (gh) is not installed. Please install it and try again."
+    exit 1
+fi
+
+# Get feature branch name from the 1st parameter.
+branchname=$1
+
+# Check if user provided the feature branch name.
+if [ -z "$branchname" ]; then
+    echo "Branch name not provided as a parameter."
+    exit 1
+fi
+
+# Helper to handle failing commands.
+execute_command() {
+    if ! $1; then
+        echo "Failed to execute: $1"
+        exit 1
+    fi
+}
+
+# Checkout develop and update.
+execute_command "git checkout develop"
+execute_command "git pull"
+
+# Checkout to develop and update.
+execute_command "git checkout $branchname"
+execute_command "git pull"
+
+# Merge from 'develop'
+if ! git merge origin/develop; then
+    echo "Merge conflict detected on merging with 'origin/develop'. Please resolve manually."
+    exit 1
+fi
+execute_command "git push"
+
+# Get all open PRs where $branchname is their base.
+pr_list=$(gh pr list --base $branchname --state open --json headRefName --jq '.[].headRefName')
+if [ $? -ne 0 ]; then
+    echo "Failed to fetch pull request list."
+    exit 1
+else
+    echo "List of branches from open pull requests:"
+    echo "$pr_list"
+fi
+
+# Handle each branch from the list above.
+for pr_branch in $pr_list; do
+    execute_command "git checkout $pr_branch"
+    execute_command "git pull"
+
+    if ! git merge origin/$branchname; then
+        echo "Merge conflict detected on merging with 'origin/$branchname' in branch '$pr_branch'. Please resolve manually."
+        exit 1
+    fi
+    execute_command "git push"
+done
