@@ -39,9 +39,11 @@ execute_command "git pull"
 # Merge from 'develop'
 if ! git merge origin/develop; then
     echo "Merge conflict detected on merging with 'origin/develop'. Please resolve manually."
+    git merge --abort
     exit 1
+else
+    execute_command "git push"  
 fi
-execute_command "git push"
 
 # Get all open PRs where $branchname is their base.
 pr_list=$(gh pr list --base $branchname --state open --json headRefName --jq '.[].headRefName')
@@ -60,7 +62,9 @@ for pr_branch in $pr_list; do
 
     if ! git merge origin/$branchname; then
         echo "Merge conflict detected on merging with 'origin/$branchname' in branch '$pr_branch'. Please resolve manually."
+        git merge --abort
         exit 1
+    else
+        execute_command "git push"  
     fi
-    execute_command "git push"
 done
