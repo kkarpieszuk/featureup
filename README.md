@@ -1,10 +1,7 @@
-## Instalattion
+## Installation
 
 - copy `featureup` file from this repository to any location in your `$PATH` (eg `/usr/bin/local/featureup`)
 - make it executable `chmod +x /usr/bin/local/featureup`
-
-## Requirements
-- `git` and `gh` (GitHub CLI) must be installed
 
 ## Usage
 
@@ -23,3 +20,7 @@ This will:
 - for each sub-branch, it will merge `our-new-feature` into them and push
 
 If any error happen (command execution fails, merge impossible due to conflicts) script will terminate with code `1` and print the info about the termination reason.
+
+
+## Requirements
+- `git` and `gh` (GitHub CLI) must be installed (although the script will check this as well before running)
